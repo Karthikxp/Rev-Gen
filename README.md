@@ -77,12 +77,6 @@ revgen --ip 192.168.1.100 --port 4444 --lang bash --copy
 # 🎯 Payload copied to clipboard!
 ```
 
-### 🔥 **Hollywood Hacker Mode**
-Enable fancy ASCII art and styling:
-```bash
-revgen --ip 10.0.0.5 --port 4444 --all --fancy
-```
-
 ### 🌐 **Built-in Web Server**
 Host payloads on a local web server for team access:
 ```bash
