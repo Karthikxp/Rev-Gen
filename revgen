@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""
+RevGen - Reverse Shell Genie
+Simple launcher script
+"""
+
+import os
+import sys
+
+# Get the directory where this script is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Add the script directory to Python path
+sys.path.insert(0, script_dir)
+
+# Import and run the main application
+if __name__ == "__main__":
+    # Change to script directory to ensure relative imports work
+    os.chdir(script_dir)
+    
+    # Import the main function
+    from revgen import main
+    
+    # Run the application
+    main()

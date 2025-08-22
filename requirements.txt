@@ -1,0 +1,24 @@
+# RevGen Requirements
+# Core dependencies for reverse shell payload generation
+
+# No external dependencies required for core functionality!
+# RevGen is designed to work with Python 3.6+ standard library only
+
+# Optional dependencies (install separately if needed):
+#
+# For QR code generation:
+# qrcode[pil]>=7.0
+#
+# For enhanced clipboard support on Linux:
+# pyperclip>=1.8.0
+#
+# For advanced web server features:
+# requests>=2.25.0
+#
+# For development:
+# pytest>=6.0
+# black>=21.0
+# flake8>=3.8
+# mypy>=0.800
+
+# The beauty of RevGen is its simplicity - it works out of the box! 🧞‍♂️

