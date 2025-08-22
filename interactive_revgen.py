@@ -63,7 +63,7 @@ class InteractiveRevGen:
     
     def print_welcome(self):
         """Print welcome banner and info"""
-        print_banner("main", fancy=False)
+        print_banner("main")
         print(f"{Colors.NEON_CYAN}🧞‍♂️ Welcome to RevGen Interactive! 🧞‍♂️{Colors.RESET}")
         print(f"{Colors.YELLOW}Choose your reverse shell payload with guided assistance{Colors.RESET}")
         print("=" * 60)

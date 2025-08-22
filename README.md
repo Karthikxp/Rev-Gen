@@ -132,8 +132,8 @@ revgen --ip 192.168.1.100 --port 4444 --lang bash
 # List all available shell types
 revgen --list
 
-# Generate all payloads with fancy output
-revgen --ip 10.0.0.5 --port 9001 --all --fancy
+# Generate all payloads
+revgen --ip 10.0.0.5 --port 9001 --all
 ```
 
 ### Advanced Features
@@ -346,28 +346,19 @@ revgen --list
 ## 📞 Support
 
 ### Documentation
-- 📖 **Full documentation**: [GitHub Wiki](https://github.com/karthikm/revgen/wiki)
-- 🎥 **Video tutorials**: [YouTube Playlist](https://youtube.com/playlist)
-- 💬 **Community Discord**: [Join Here](https://discord.gg/revgen)
+- 📖 **Full documentation**: [GitHub Wiki](https://github.com/karthikm/revgen/README.md)
+
 
 ### Getting Help
-- 🐛 **Bug reports**: [GitHub Issues](https://github.com/karthikm/revgen/issues)
-- 💡 **Feature requests**: [GitHub Discussions](https://github.com/karthikm/revgen/discussions)
+- 🐛 **Bug reports**: [GitHub Issues](https://github.com/karthikm/revgen/)
+- 💡 **Feature requests**: [GitHub Discussions](https://github.com/karthikm/revgen)
 - 📧 **Security issues**: security@revgen.dev
 
 ---
 
-## 🏆 Acknowledgments
 
-### Inspiration
-- The countless late-night CTF sessions where we needed "just one more reverse shell"
-- The pentesting community's endless creativity
-- Every hacker who's ever typed `nc -lvnp 4444`
 
-### Special Thanks
-- **Contributors** who added shell variants
-- **Security researchers** who tested and validated payloads
-- **CTF organizers** who keep the learning spirit alive
+
 
 ---
 
@@ -381,14 +372,12 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-### 🧞‍♂️ *"Your wish for the perfect reverse shell is my command!"* 🧞‍♂️
 
-**Made with ❤️ by security enthusiasts, for security enthusiasts**
 
 [⭐ Star this repo](https://github.com/karthikm/revgen) • [🍴 Fork it](https://github.com/karthikm/revgen/fork) • [📢 Share it](https://twitter.com/intent/tweet?text=Check%20out%20RevGen%20-%20the%20ultimate%20reverse%20shell%20generator!%20%F0%9F%A7%9E%E2%80%8D%E2%99%82%EF%B8%8F&url=https://github.com/karthikm/revgen)
 
 ---
 
-*Remember: With great power comes great responsibility. Use your powers for good! 🦸‍♂️*
+
 
 </div>
