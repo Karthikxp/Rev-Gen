@@ -132,7 +132,7 @@ class InteractiveRevGen:
         options = {"obfuscate": False, "encoding_method": "none"}
         
         # Only show encoding options for shells that benefit from it
-        encoding_shells = ["powershell_persistent", "powershell", "python3_persistent", "python_persistent"]
+        encoding_shells = ["powershell_persistent", "powershell", "python3_persistent", "python_persistent", "python3", "python"]
         
         if shell_type not in encoding_shells:
             return options
@@ -154,6 +154,11 @@ class InteractiveRevGen:
             print("Encoding options for Python payloads:")
             print("  1. 🔓 None (plain text)")
             print("  2. 🔐 Base64 Encoding")
+            print("  3. 🎭 Advanced Stealth (random vars + base64)")
+            print("  4. 🗜️  Zlib Compression + Base64")
+            print("  5. 🔄 ROT13 + Base64 Double Encoding")
+            print("  6. 🔢 Hex Encoding with bytes.fromhex()")
+            print("  7. 📦 Marshal Bytecode Obfuscation (stealth)")
         
         while True:
             try:
@@ -184,7 +189,7 @@ class InteractiveRevGen:
                     else:
                         print_error("Invalid choice. Please enter 1-4.")
                 else:
-                    print(f"\n{Colors.BOLD}Choose encoding (1-2): {Colors.RESET}", end="")
+                    print(f"\n{Colors.BOLD}Choose encoding (1-7): {Colors.RESET}", end="")
                     choice = input().strip()
                     
                     if choice == "1":
@@ -197,8 +202,33 @@ class InteractiveRevGen:
                         options["encoding_method"] = "base64"
                         print_info("Using Base64 encoding")
                         break
+                    elif choice == "3":
+                        options["obfuscate"] = True
+                        options["encoding_method"] = "python_stealth"
+                        print_info("Using advanced stealth obfuscation")
+                        break
+                    elif choice == "4":
+                        options["obfuscate"] = True
+                        options["encoding_method"] = "python_zlib"
+                        print_info("Using zlib compression + base64")
+                        break
+                    elif choice == "5":
+                        options["obfuscate"] = True
+                        options["encoding_method"] = "python_rot13"
+                        print_info("Using ROT13 + base64 double encoding")
+                        break
+                    elif choice == "6":
+                        options["obfuscate"] = True
+                        options["encoding_method"] = "python_hex"
+                        print_info("Using hex encoding")
+                        break
+                    elif choice == "7":
+                        options["obfuscate"] = True
+                        options["encoding_method"] = "python_marshal"
+                        print_info("Using marshal bytecode obfuscation")
+                        break
                     else:
-                        print_error("Invalid choice. Please enter 1 or 2.")
+                        print_error("Invalid choice. Please enter 1-7.")
                         
             except KeyboardInterrupt:
                 print(f"\n{Colors.YELLOW}🧞‍♂️ Goodbye!{Colors.RESET}")
@@ -340,6 +370,16 @@ class InteractiveRevGen:
                 print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} Advanced Multi-Layer Obfuscation")
             elif encoding_method == "base64":
                 print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} Base64")
+            elif encoding_method == "python_stealth":
+                print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} Advanced Stealth (Random Variables + Base64)")
+            elif encoding_method == "python_zlib":
+                print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} Zlib Compression + Base64")
+            elif encoding_method == "python_rot13":
+                print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} ROT13 + Base64 Double Encoding")
+            elif encoding_method == "python_hex":
+                print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} Hex Encoding with bytes.fromhex()")
+            elif encoding_method == "python_marshal":
+                print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} Marshal Bytecode Obfuscation")
             else:
                 print(f"{Colors.BOLD}{Colors.MAGENTA}🔐 Encoding:{Colors.RESET} {encoding_method}")
         else:
