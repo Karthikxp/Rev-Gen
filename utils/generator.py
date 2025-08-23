@@ -133,13 +133,20 @@ class PayloadGenerator:
         
         return results
     
-    def _validate_ip(self, ip: str) -> bool:
-        """Validate IP address format"""
+    def _validate_ip(self, address: str) -> bool:
+        """Validate IP address or hostname format"""
+        # First, check for valid IP address
         try:
-            ipaddress.ip_address(ip)
+            ipaddress.ip_address(address)
             return True
         except ValueError:
-            return False
+            # If not an IP, check if it's a resolvable hostname
+            try:
+                import socket
+                socket.gethostbyname(address)
+                return True
+            except socket.gaierror:
+                return False
     
     def _validate_port(self, port: int) -> bool:
         """Validate port number"""
